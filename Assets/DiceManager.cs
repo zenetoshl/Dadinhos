@@ -26,23 +26,10 @@ public class DiceManager : MonoBehaviour {
             dices[(i + 2) % nDices].Roll ();
             dices[(i + 4) % nDices].Roll ();
             i = (i + 1) % nDices;
-        } else if (changed) {
-            changed = false;
-            for (int i = 0; i < 6; i++) {
-                GetNumber (i + 1);
-            }
-            for (int i = 0; i < 2; i++) {
-                GetSequences (4 + i);
-            }
-            for (int i = 3; i < 6; i++) {
-                GetRepetitions (i);
-            }
-            GetDoublePair ();
-            GetFullHouse ();
         }
     }
 
-    public void ChangeRollStatus () {
+    public static void ChangeRollStatus () {
         rolling = !rolling;
     }
 
@@ -51,11 +38,25 @@ public class DiceManager : MonoBehaviour {
         List<int> indexes = new List<int> ();
         foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
             if (d.GetFace () == num) {
-                points += num;
+                points += d.GetFace ();
                 indexes.Add (d.index);
             }
         }
         Debug.Log (num + ": " + points);
+        Points returnPoints = new Points ();
+        returnPoints.points = points;
+        returnPoints.indexes = indexes;
+        return returnPoints;
+    }
+
+    public Points GetAny () {
+        int points = 0;
+        List<int> indexes = new List<int> ();
+        foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
+            points += d.GetFace ();
+            indexes.Add (d.index);
+        }
+        Debug.Log ("Any: " + points);
         Points returnPoints = new Points ();
         returnPoints.points = points;
         returnPoints.indexes = indexes;
@@ -69,12 +70,12 @@ public class DiceManager : MonoBehaviour {
         int lastIndex = -1;
         List<int> indexes = new List<int> ();
         foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
+            points = points + d.GetFace ();
             if (d.GetFace () == prevFaces) {
                 indexes.Add (lastIndex);
                 indexes.Add (d.index);
                 pair += 1;
                 prevFaces = 0;
-                points = points + (d.GetFace () * 2);
             } else {
                 prevFaces = d.GetFace ();
                 lastIndex = d.index;
@@ -132,13 +133,13 @@ public class DiceManager : MonoBehaviour {
         bool sequenceFound = false;
         List<int> indexes = new List<int> ();
         foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
+            points = points + d.GetFace ();
             if (!sequenceFound) {
                 indexes.Add (d.index);
             }
             if (d.GetFace () == prevFaces) {
                 sequence++;
                 if (sequence + 1 == num) {
-                    points = d.GetFace () * num;
                     sequenceFound = true;
                 }
             } else {
@@ -150,6 +151,7 @@ public class DiceManager : MonoBehaviour {
             }
         }
         if (!sequenceFound) {
+            points = 0;
             indexes = new List<int> ();
         }
         Debug.Log ("Repetition of " + num + ": " + points);
@@ -166,6 +168,7 @@ public class DiceManager : MonoBehaviour {
         bool sequenceFound = false;
         List<int> indexes = new List<int> ();
         foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
+            points = points + d.GetFace ();
             if (!sequenceFound) {
                 indexes.Add (d.index);
             }
@@ -173,16 +176,12 @@ public class DiceManager : MonoBehaviour {
                 sequence++;
                 if (sequence + 1 == size) {
                     sequenceFound = true;
-                    if (d.GetFace () == 4) {
-                        points = 1 + 2 + 3 + 4;
-                    } else {
-                        points = (size == 4) ? (5 + 4 + 3 + 2) : (5 + 4 + 3 + 2 + 1);
-                    }
                 }
             } else {
                 sequence = 0;
                 prevFaces = d.GetFace ();
                 if (!sequenceFound) {
+                    points = 0;
                     indexes = new List<int> ();
                 }
             }

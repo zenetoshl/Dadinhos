@@ -1,15 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
-public class NumberPoints : UIPoints {
-    public int num;
-
+public class FullHousePoints : UIPoints
+{
     public override void SetPoints () {
         if (locked) return;
 
-        Points points = dm.GetNumber (num);
+        Points points = dm.GetFullHouse ();
         value = points.points;
         PointsText.text = "" + points.points;
         HighlightDices (points.indexes);
