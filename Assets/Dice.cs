@@ -15,7 +15,7 @@ public class Dice : MonoBehaviour {
     }
 
     public void Roll () {
-        if(locked) return;
+        if (locked) return;
 
         faceIndex = Random.Range (0, 6);
         spriteRenderer.sprite = sprites[faceIndex];
@@ -26,18 +26,23 @@ public class Dice : MonoBehaviour {
     }
 
     private void OnMouseUpAsButton () {
-        if(DiceManager.rolling) return;
-        
-        locked = !locked;
-        UpdateUI ();
+        if (DiceManager.rolling || DiceManager.reseted) return;
+
+        if (locked) {
+            Unlock ();
+        } else {
+            Lock ();
+        }
     }
 
-    private void UpdateUI () {
-        if (locked) {
-            transform.localScale = new Vector3(.3f,.3f,.3f);
-        } else {
-            transform.localScale = new Vector3(.45f,.45f,.45f);
-        }
+    public void Lock () {
+        locked = true;
+        transform.localScale = new Vector3 (.3f, .3f, .3f);
+    }
+
+    public void Unlock () {
+        locked = false;
+        transform.localScale = new Vector3 (.45f, .45f, .45f);
     }
 
 }

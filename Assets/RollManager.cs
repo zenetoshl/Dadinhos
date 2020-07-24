@@ -10,18 +10,26 @@ public class RollManager : MonoBehaviour {
     public static RollManager instance;
     public event Action OnRoll;
 
+    public const int maxRollCount = 3;
+    public int rollCount = 0;
+
     private void Awake () {
         instance = this;
     }
     private void Start () {
+        LockManager.instance.OnNewTurn += NewTurn;
         UpdateUI ();
     }
 
     public void Roll () {
+        if (!DiceManager.rolling && maxRollCount <= rollCount) return;
         DiceManager.ChangeRollStatus ();
-        if (OnRoll != null && !DiceManager.rolling) {
-            OnRoll ();
-            Debug.Log("ola");
+        if (!DiceManager.rolling) {
+            if (OnRoll != null) {
+                OnRoll ();
+            }
+        } else {
+            rollCount++;
         }
         UpdateUI ();
     }
@@ -30,7 +38,12 @@ public class RollManager : MonoBehaviour {
         if (DiceManager.rolling) {
             text.text = "Stop Roll";
         } else {
-            text.text = "Roll";
+            text.text = "Roll X" + (maxRollCount - rollCount);
         }
+    }
+
+    public void NewTurn () {
+        rollCount = 0;
+        UpdateUI();
     }
 }

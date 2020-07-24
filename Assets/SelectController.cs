@@ -5,7 +5,7 @@ using UnityEngine;
 public class SelectController : MonoBehaviour
 {
     public UIPoints uiPoint;
-    private void OnMouseUp() {
+    public void Select() {
         uiPoint.Select();
         Debug.Log("ola1");
     }

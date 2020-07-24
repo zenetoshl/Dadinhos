@@ -4,15 +4,17 @@ using System.Linq;
 using UnityEngine;
 
 public class DiceManager : MonoBehaviour {
-    public Dice[] dices;
+    public Dice[] die;
     private int i;
-    public int nDices = 5;
+    public int ndie = 5;
     public int nPlayers = 1;
     public PlayerScores[] players;
     public static bool rolling = true;
     public bool changed = true;
+    public static bool reseted = true;
 
     private void Start () {
+        LockManager.instance.OnNewTurn += NewTurn;
         i = 0;
         players = new PlayerScores[nPlayers];
         for (int i = 0; i < nPlayers; i++) {
@@ -22,21 +24,43 @@ public class DiceManager : MonoBehaviour {
     // Start is called before the first frame update
     private void FixedUpdate () {
         if (rolling) {
-            dices[i].Roll ();
-            dices[(i + 2) % nDices].Roll ();
-            dices[(i + 4) % nDices].Roll ();
-            i = (i + 1) % nDices;
+            die[i].Roll ();
+            die[(i + 2) % ndie].Roll ();
+            die[(i + 4) % ndie].Roll ();
+            i = (i + 1) % ndie;
         }
     }
 
     public static void ChangeRollStatus () {
         rolling = !rolling;
+        if(!rolling) reseted = false;
+    }
+
+    public void OrganizeDie () {
+        SortDie ();
+    }
+
+    public void SortDie () {
+        Dice[] newDie = new Dice[die.Length];
+        int i = 0;
+        foreach (Dice d in die.OrderBy (e => e.index)) {
+            newDie[i] = d;
+            i++;
+        }
+        die = newDie;
+    }
+
+    public void NewTurn(){
+        reseted = true;
+        foreach(Dice d in die){
+            d.Unlock();
+        }
     }
 
     public Points GetNumber (int num) {
         int points = 0;
         List<int> indexes = new List<int> ();
-        foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
+        foreach (Dice d in die.OrderBy (e => e.GetFace ())) {
             if (d.GetFace () == num) {
                 points += d.GetFace ();
                 indexes.Add (d.index);
@@ -52,7 +76,7 @@ public class DiceManager : MonoBehaviour {
     public Points GetAny () {
         int points = 0;
         List<int> indexes = new List<int> ();
-        foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
+        foreach (Dice d in die.OrderBy (e => e.GetFace ())) {
             points += d.GetFace ();
             indexes.Add (d.index);
         }
@@ -69,7 +93,7 @@ public class DiceManager : MonoBehaviour {
         int pair = 0;
         int lastIndex = -1;
         List<int> indexes = new List<int> ();
-        foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
+        foreach (Dice d in die.OrderBy (e => e.GetFace ())) {
             points = points + d.GetFace ();
             if (d.GetFace () == prevFaces) {
                 indexes.Add (lastIndex);
@@ -99,7 +123,7 @@ public class DiceManager : MonoBehaviour {
         int triple = 0;
         bool paired = false;
         List<int> indexes = new List<int> ();
-        foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
+        foreach (Dice d in die.OrderBy (e => e.GetFace ())) {
             indexes.Add (d.index);
             if (d.GetFace () == prevFaces) {
                 if (paired) {
@@ -112,8 +136,9 @@ public class DiceManager : MonoBehaviour {
                     points = points + (d.GetFace () * 2);
                 }
             } else {
-                prevFaces = d.GetFace ();
+                paired = false;
             }
+            prevFaces = d.GetFace ();
         }
         if (pair != 1 || triple != 1) {
             points = 0;
@@ -132,7 +157,7 @@ public class DiceManager : MonoBehaviour {
         int sequence = 0;
         bool sequenceFound = false;
         List<int> indexes = new List<int> ();
-        foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
+        foreach (Dice d in die.OrderBy (e => e.GetFace ())) {
             points = points + d.GetFace ();
             if (!sequenceFound) {
                 indexes.Add (d.index);
@@ -144,11 +169,11 @@ public class DiceManager : MonoBehaviour {
                 }
             } else {
                 sequence = 0;
-                prevFaces = d.GetFace ();
                 if (!sequenceFound) {
                     indexes = new List<int> ();
                 }
             }
+            prevFaces = d.GetFace ();
         }
         if (!sequenceFound) {
             points = 0;
@@ -163,11 +188,11 @@ public class DiceManager : MonoBehaviour {
 
     public Points GetSequences (int size) {
         int points = 0;
-        int prevFaces = 0;
+        int prevFaces = -10;
         int sequence = 0;
         bool sequenceFound = false;
         List<int> indexes = new List<int> ();
-        foreach (Dice d in dices.OrderBy (e => e.GetFace ())) {
+        foreach (Dice d in die.OrderBy (e => e.GetFace ())) {
             points = points + d.GetFace ();
             if (!sequenceFound) {
                 indexes.Add (d.index);
@@ -179,15 +204,15 @@ public class DiceManager : MonoBehaviour {
                 }
             } else {
                 sequence = 0;
-                prevFaces = d.GetFace ();
                 if (!sequenceFound) {
-                    points = 0;
                     indexes = new List<int> ();
                 }
             }
+            prevFaces = d.GetFace ();
         }
         if (!sequenceFound) {
             indexes = new List<int> ();
+            points = 0;
         }
         Debug.Log ("Sequence size " + size + ": " + points);
         Points returnPoints = new Points ();

@@ -23,18 +23,22 @@ public abstract class UIPoints : MonoBehaviour
     }
 
     public void Lock () {
-        if (locked) return;
+        if (locked ||  DiceManager.reseted) return;
 
         locked = true;
-        PointsText.color = new Color32 (0, 0, 0, 255);
+        PointsText.color = new Color32 (40, 40, 40, 255);
         LockManager.selected = null;
     }
 
     public void Select () {
-        if (locked) return;
+        if (locked ||  DiceManager.reseted) return;
 
+        PointsText.color = new Color32 (20, 20, 20, 255);
+        LockManager.Select(this);
+        
+    }
+
+    public void Unselect(){
         PointsText.color = new Color32 (0, 0, 0, 255);
-        LockManager.selected = this;
-        Debug.Log("selected");
     }
 }
