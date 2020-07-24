@@ -34,9 +34,9 @@ public class Dice : MonoBehaviour {
 
     private void UpdateUI () {
         if (locked) {
-            //ativar aura
+            transform.localScale = new Vector3(.3f,.3f,.3f);
         } else {
-            //desativar aura
+            transform.localScale = new Vector3(.45f,.45f,.45f);
         }
     }
 
