@@ -4,56 +4,127 @@ using System.Linq;
 using UnityEngine;
 
 public class DiceManager : MonoBehaviour {
-    public Dice[] die;
+    public List<Dice> die = new List<Dice> ();
+    private List<Dice> unselected = new List<Dice> ();
+    private List<Dice> selected = new List<Dice> ();
     private int i;
-    public int ndie = 5;
+    private int nunselected = 5;
     public int nPlayers = 1;
     public PlayerScores[] players;
     public static bool rolling = true;
-    public bool changed = true;
     public static bool reseted = true;
+    public float unselectedSpacing = 2.7f;
+    public float selectedSpacing = 1.8f;
+    public float mediumPoint = 0f;
+    public float selectStartPoint = -3.6f;
+
+    private float selectedYAxis;
+
+    public static DiceManager instance;
+
+    private void Awake () {
+        instance = this;
+    }
+
+    public void RemoveFromUnselected (Dice d) {
+        unselected.Remove (d);
+        selected.Add (d);
+        OrganizeUnselected ();
+        OrganizeSelected ();
+    }
+
+    public void RemoveFromSelected (Dice d) {
+        unselected.Add (d);
+        selected.Remove (d);
+        OrganizeUnselected ();
+        OrganizeSelected ();
+    }
 
     private void Start () {
         LockManager.instance.OnNewTurn += NewTurn;
+        selectedYAxis = Camera.main.ScreenToWorldPoint (new Vector3 (0f, Screen.height, 0f)).y - (selectedSpacing / 2);
+        initializeUnselected ();
         i = 0;
         players = new PlayerScores[nPlayers];
         for (int i = 0; i < nPlayers; i++) {
             players[i] = ScriptableObject.CreateInstance<PlayerScores> () as PlayerScores;
         }
+        OrganizeUnselected ();
+        OrganizeSelected ();
     }
-    // Start is called before the first frame update
+
+    private void initializeUnselected () {
+        foreach (Dice d in die) {
+            unselected.Add (d);
+        }
+    }
+
     private void FixedUpdate () {
         if (rolling) {
-            die[i].Roll ();
-            die[(i + 2) % ndie].Roll ();
-            die[(i + 4) % ndie].Roll ();
-            i = (i + 1) % ndie;
+            unselected[i].Roll ();
+            unselected[(i + 2) % nunselected].Roll ();
+            unselected[(i + 4) % nunselected].Roll ();
+            i = (i + 1) % nunselected;
         }
     }
 
     public static void ChangeRollStatus () {
         rolling = !rolling;
-        if(!rolling) reseted = false;
+        if (!rolling) reseted = false;
     }
 
-    public void OrganizeDie () {
-        SortDie ();
+    private void OrganizeUnselected () {
+        Sortunselected ();
+        nunselected = unselected.Count;
+        float firstPos = 0f;
+        switch (nunselected) {
+            case 1:
+                firstPos = mediumPoint;
+                break;
+            case 2:
+                firstPos = mediumPoint - (unselectedSpacing / 2);
+                break;
+            case 3:
+                firstPos = mediumPoint - unselectedSpacing;
+                break;
+            case 4:
+                firstPos = mediumPoint - unselectedSpacing - (unselectedSpacing / 2);
+                break;
+            case 5:
+                firstPos = mediumPoint - (unselectedSpacing * 2);
+                break;
+            default:
+                break;
+        }
+        float nextPos = firstPos;
+        foreach (Dice d in unselected) {
+            d.transform.localPosition = new Vector3 (nextPos, 0, 0);
+            nextPos += unselectedSpacing;
+        }
     }
 
-    public void SortDie () {
-        Dice[] newDie = new Dice[die.Length];
+    private void OrganizeSelected () {
+        float nextPos = selectStartPoint;
+        foreach (Dice d in selected) {
+            d.transform.localPosition = new Vector3 (nextPos, selectedYAxis, 0);
+            nextPos += selectedSpacing;
+        }
+    }
+
+    private void Sortunselected () {
+        List<Dice> newunselected = new List<Dice> ();
         int i = 0;
-        foreach (Dice d in die.OrderBy (e => e.index)) {
-            newDie[i] = d;
+        foreach (Dice d in unselected.OrderBy (e => e.index)) {
+            newunselected.Add (d);
             i++;
         }
-        die = newDie;
+        unselected = newunselected;
     }
 
-    public void NewTurn(){
+    public void NewTurn () {
         reseted = true;
-        foreach(Dice d in die){
-            d.Unlock();
+        foreach (Dice d in selected) {
+            d.Unlock ();
         }
     }
 
