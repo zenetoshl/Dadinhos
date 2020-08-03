@@ -11,7 +11,7 @@ public class DiceManager : MonoBehaviour {
     private int nunselected = 5;
     public int nPlayers = 1;
     public PlayerScores[] players;
-    public static bool rolling = true;
+    public static bool rolling = false;
     public static bool reseted = true;
     public float unselectedSpacing = 2.7f;
     public float selectedSpacing = 1.8f;
