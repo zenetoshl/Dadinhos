@@ -16,10 +16,12 @@ public class RollManager : MonoBehaviour {
 
     public static int playerId;
 
-    public const int nRounds = 1;
+    public const int nRounds = 13;
     private int round;
 
     public string[] playerNames = { "player_1", "Player_2" };
+
+    public GameObject errorMessage;
 
     private void Awake () {
         instance = this;
@@ -33,7 +35,10 @@ public class RollManager : MonoBehaviour {
     }
 
     public void Roll () {
-        if (!DiceManager.rolling && maxRollCount <= rollCount) return;
+        if (!DiceManager.rolling && maxRollCount <= rollCount) {
+            StartCoroutine(ShowErrorMessage());
+            return;
+        }
         DiceManager.ChangeRollStatus ();
         if (!DiceManager.rolling) {
             if (OnRoll != null) {
@@ -47,9 +52,9 @@ public class RollManager : MonoBehaviour {
 
     public void UpdateUI () {
         if (DiceManager.rolling) {
-            rollText.text = "Stop Roll";
+            rollText.text = "Parar";
         } else {
-            rollText.text = "Roll X" + (maxRollCount - rollCount);
+            rollText.text = "Rolar X" + (maxRollCount - rollCount);
         }
     }
 
@@ -67,5 +72,11 @@ public class RollManager : MonoBehaviour {
         playerId = 1 + (playerId % nPlayers);
         playerName.text = playerNames[playerId - 1];
         UpdateUI ();
+    }
+
+    private IEnumerator ShowErrorMessage(){
+        errorMessage.SetActive(true);
+        yield return new WaitForSeconds(5f);
+        errorMessage.SetActive(false);
     }
 }

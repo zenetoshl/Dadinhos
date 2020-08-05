@@ -14,4 +14,13 @@ public class NumberPoints : UIPoints {
         PointsText.text = "" + points.points;
         HighlightDices (points.indexes);
     }
+
+    public override void Lock(){
+        if (locked || DiceManager.reseted || RollManager.playerId != playerId) return;
+        TotalPointsManager.instance.totalPoints[playerId - 1].Lock ();
+        locked = true;
+        PointsText.color = new Color32 (255, 255, 255, 255);
+        LockManager.selected = null;
+        BonusManager.instance.AddPointsToSum(value);
+    }
 }

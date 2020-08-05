@@ -9,10 +9,13 @@ public abstract class UIPoints : MonoBehaviour {
     public int playerId;
     public bool locked = false;
     public int value = 0;
+    public GameObject errorMessage;
 
     private void Start () {
         RollManager.instance.OnRoll += SetPoints;
         LockManager.instance.OnNewTurn += ResetValue;
+        errorMessage = PointsErrorsManager.selectLockedError;
+        errorMessage.SetActive(false);
     }
 
     public abstract void SetPoints (int id);
@@ -22,7 +25,7 @@ public abstract class UIPoints : MonoBehaviour {
         return;
     }
 
-    public void Lock () {
+    public virtual void Lock () {
         if (locked || DiceManager.reseted || RollManager.playerId != playerId) return;
         TotalPointsManager.instance.totalPoints[playerId - 1].Lock ();
         locked = true;
@@ -31,7 +34,12 @@ public abstract class UIPoints : MonoBehaviour {
     }
 
     public void Select () {
-        if (locked || DiceManager.reseted || RollManager.playerId != playerId) return;
+        if (locked || DiceManager.reseted || RollManager.playerId != playerId) {
+            if(locked){
+                StartCoroutine(ShowErrorMessage());
+            }
+            return;
+        }
         TotalPointsManager.instance.totalPoints[playerId - 1].selectedPoints = value;
         TotalPointsManager.instance.totalPoints[playerId - 1].UpdateUI ();
         PointsText.color = new Color32 (200, 200, 200, 255);
@@ -49,5 +57,11 @@ public abstract class UIPoints : MonoBehaviour {
 
         value = 0;
         PointsText.text = "" + value;
+    }
+
+    private IEnumerator ShowErrorMessage(){
+        errorMessage.SetActive(true);
+        yield return new WaitForSeconds(5);
+        errorMessage.SetActive(false);
     }
 }

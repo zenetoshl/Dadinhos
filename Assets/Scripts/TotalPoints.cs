@@ -30,4 +30,9 @@ public class TotalPoints : MonoBehaviour
         return lockedPoints;
     }
 
+    public void AddBonus(int bonus){
+        lockedPoints += bonus;
+        UpdateUI();
+    }
+
 }
