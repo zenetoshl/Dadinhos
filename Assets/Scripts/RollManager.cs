@@ -8,16 +8,19 @@ public class RollManager : MonoBehaviour {
     public TextMeshProUGUI text;
 
     public static RollManager instance;
-    public event Action OnRoll;
+    public event Action<int> OnRoll;
 
     public const int maxRollCount = 3;
     public int rollCount = 0;
+
+    public static int playerId;
 
     private void Awake () {
         instance = this;
     }
     private void Start () {
         LockManager.instance.OnNewTurn += NewTurn;
+        playerId = 1;
         UpdateUI ();
     }
 
@@ -26,7 +29,7 @@ public class RollManager : MonoBehaviour {
         DiceManager.ChangeRollStatus ();
         if (!DiceManager.rolling) {
             if (OnRoll != null) {
-                OnRoll ();
+                OnRoll (playerId);
             }
         } else {
             rollCount++;
@@ -44,6 +47,7 @@ public class RollManager : MonoBehaviour {
 
     public void NewTurn () {
         rollCount = 0;
+        playerId = (playerId == 1) ? 2 : 1;
         UpdateUI();
     }
 }

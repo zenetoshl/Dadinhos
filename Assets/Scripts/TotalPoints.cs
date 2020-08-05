@@ -6,23 +6,22 @@ using TMPro;
 public class TotalPoints : MonoBehaviour
 {
     public TextMeshProUGUI PointsText;
-    public DiceManager dm;
-    public bool locked = false;
-    public List<UIPoints> uiList;
+    private int lockedPoints;
+    public int selectedPoints;
 
-    private void Start () {
-        RollManager.instance.OnRoll += SetPoints;
+    private void Start() {
+        lockedPoints = 0;
+        selectedPoints = 0;
     }
 
-    public void SetPoints () {
-        if (locked) return;
-        int total = 0;
-        foreach (UIPoints uiPoints in uiList)
-        {
-            if(uiPoints.locked){
-                total += uiPoints.value;
-            }
-        }
+    public void UpdateUI () {
+        int total = lockedPoints + selectedPoints;
         PointsText.text = "" + total;
     }
+
+    public void Lock(){
+        lockedPoints += selectedPoints;
+        selectedPoints = 0;
+    }
+
 }

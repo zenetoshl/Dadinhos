@@ -7,7 +7,7 @@ using System;
 public abstract class UIPoints : MonoBehaviour
 {
     public TextMeshProUGUI PointsText;
-    public DiceManager dm;
+    public int playerId;
     public bool locked = false;
     public int value = 0;
 
@@ -15,7 +15,7 @@ public abstract class UIPoints : MonoBehaviour
         RollManager.instance.OnRoll += SetPoints;
     }
 
-    public abstract void SetPoints();
+    public abstract void SetPoints(int id);
 
     public void HighlightDices (List<int> indexes) {
         //highlight dos dados
@@ -23,22 +23,24 @@ public abstract class UIPoints : MonoBehaviour
     }
 
     public void Lock () {
-        if (locked ||  DiceManager.reseted) return;
-
+        if (locked ||  DiceManager.reseted || RollManager.playerId !=  playerId) return;
+        TotalPointsManager.instance.totalPoints[playerId - 1].Lock();
         locked = true;
-        PointsText.color = new Color32 (40, 40, 40, 255);
+        PointsText.color = new Color32 (255, 255, 255, 255);
         LockManager.selected = null;
     }
 
     public void Select () {
-        if (locked ||  DiceManager.reseted) return;
-
-        PointsText.color = new Color32 (20, 20, 20, 255);
+        if (locked ||  DiceManager.reseted || RollManager.playerId !=  playerId) return;
+        TotalPointsManager.instance.totalPoints[playerId - 1].selectedPoints = value;
+        TotalPointsManager.instance.totalPoints[playerId - 1].UpdateUI();
+        PointsText.color = new Color32 (200, 200, 200, 255);
         LockManager.Select(this);
         
     }
 
     public void Unselect(){
-        PointsText.color = new Color32 (0, 0, 0, 255);
+        TotalPointsManager.instance.totalPoints[playerId - 1].UpdateUI();
+        PointsText.color = new Color32 (220, 220, 220, 255);
     }
 }

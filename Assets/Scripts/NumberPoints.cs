@@ -6,10 +6,10 @@ using UnityEngine;
 public class NumberPoints : UIPoints {
     public int num;
 
-    public override void SetPoints () {
-        if (locked) return;
+    public override void SetPoints (int id) {
+        if (locked || id != playerId) return;
 
-        Points points = dm.GetNumber (num);
+        Points points = DiceManager.instance.GetNumber (num);
         value = points.points;
         PointsText.text = "" + points.points;
         HighlightDices (points.indexes);

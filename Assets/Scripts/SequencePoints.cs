@@ -6,10 +6,10 @@ public class SequencePoints : UIPoints
 {
     public int size;
 
-    public override void SetPoints () {
-        if (locked) return;
+    public override void SetPoints (int id) {
+        if (locked || id != playerId) return;
 
-        Points points = dm.GetSequences (size);
+        Points points = DiceManager.instance.GetSequences (size);
         value = points.points;
         PointsText.text = "" + points.points;
         HighlightDices (points.indexes);

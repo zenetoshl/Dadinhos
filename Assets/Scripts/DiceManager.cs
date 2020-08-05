@@ -7,7 +7,7 @@ public class DiceManager : MonoBehaviour {
     public List<Dice> die = new List<Dice> ();
     private List<Dice> unselected = new List<Dice> ();
     private List<Dice> selected = new List<Dice> ();
-    private int i;
+    private int i = 0;
     private int nunselected = 5;
     public int nPlayers = 1;
     public PlayerScores[] players;
@@ -61,10 +61,10 @@ public class DiceManager : MonoBehaviour {
 
     private void FixedUpdate () {
         if (rolling) {
+            i = (i + 1) % nunselected;
             unselected[i].Roll ();
             unselected[(i + 2) % nunselected].Roll ();
             unselected[(i + 4) % nunselected].Roll ();
-            i = (i + 1) % nunselected;
         }
     }
 

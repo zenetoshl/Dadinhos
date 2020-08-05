@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class AnyPoints : UIPoints
 {
-    public override void SetPoints () {
-        if (locked) return;
+    public override void SetPoints (int id) {
+        if (locked || id != playerId) return;
 
-        Points points = dm.GetAny ();
+        Points points = DiceManager.instance.GetAny ();
         value = points.points;
         PointsText.text = "" + points.points;
         HighlightDices (points.indexes);
