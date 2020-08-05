@@ -1,11 +1,10 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 using TMPro;
-using System;
+using UnityEngine;
 
-public abstract class UIPoints : MonoBehaviour
-{
+public abstract class UIPoints : MonoBehaviour {
     public TextMeshProUGUI PointsText;
     public int playerId;
     public bool locked = false;
@@ -13,9 +12,10 @@ public abstract class UIPoints : MonoBehaviour
 
     private void Start () {
         RollManager.instance.OnRoll += SetPoints;
+        LockManager.instance.OnNewTurn += ResetValue;
     }
 
-    public abstract void SetPoints(int id);
+    public abstract void SetPoints (int id);
 
     public void HighlightDices (List<int> indexes) {
         //highlight dos dados
@@ -23,24 +23,31 @@ public abstract class UIPoints : MonoBehaviour
     }
 
     public void Lock () {
-        if (locked ||  DiceManager.reseted || RollManager.playerId !=  playerId) return;
-        TotalPointsManager.instance.totalPoints[playerId - 1].Lock();
+        if (locked || DiceManager.reseted || RollManager.playerId != playerId) return;
+        TotalPointsManager.instance.totalPoints[playerId - 1].Lock ();
         locked = true;
         PointsText.color = new Color32 (255, 255, 255, 255);
         LockManager.selected = null;
     }
 
     public void Select () {
-        if (locked ||  DiceManager.reseted || RollManager.playerId !=  playerId) return;
+        if (locked || DiceManager.reseted || RollManager.playerId != playerId) return;
         TotalPointsManager.instance.totalPoints[playerId - 1].selectedPoints = value;
-        TotalPointsManager.instance.totalPoints[playerId - 1].UpdateUI();
+        TotalPointsManager.instance.totalPoints[playerId - 1].UpdateUI ();
         PointsText.color = new Color32 (200, 200, 200, 255);
-        LockManager.Select(this);
-        
+        LockManager.Select (this);
+
     }
 
-    public void Unselect(){
-        TotalPointsManager.instance.totalPoints[playerId - 1].UpdateUI();
+    public void Unselect () {
+        TotalPointsManager.instance.totalPoints[playerId - 1].UpdateUI ();
         PointsText.color = new Color32 (220, 220, 220, 255);
+    }
+
+    public void ResetValue () {
+        if (locked) return;
+
+        value = 0;
+        PointsText.text = "" + value;
     }
 }

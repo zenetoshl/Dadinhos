@@ -36,12 +36,14 @@ public class Dice : MonoBehaviour {
     }
 
     public void Lock () {
+        if(locked) return;
         locked = true;
         transform.localScale = new Vector3 (.3f, .3f, .3f);
         DiceManager.instance.RemoveFromUnselected(this);
     }
 
     public void Unlock () {
+        if(!locked) return;
         locked = false;
         transform.localScale = new Vector3 (.45f, .45f, .45f);
         DiceManager.instance.RemoveFromSelected(this);

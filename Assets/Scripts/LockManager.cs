@@ -6,7 +6,6 @@ using UnityEngine;
 public class LockManager : MonoBehaviour
 {
     public static UIPoints selected = null;
-    public DiceManager dm;
 
     public static LockManager instance;
     public event Action OnNewTurn;
@@ -17,7 +16,7 @@ public class LockManager : MonoBehaviour
 
     public void Lock(){
         if(selected == null) return;
-        Debug.Log("lockado?");
+        
         selected.Lock();
         selected = null;
         if (OnNewTurn != null) {

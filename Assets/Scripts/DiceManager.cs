@@ -9,7 +9,7 @@ public class DiceManager : MonoBehaviour {
     private List<Dice> selected = new List<Dice> ();
     private int i = 0;
     private int nunselected = 5;
-    public int nPlayers = 1;
+    public int nPlayers = 2;
     public PlayerScores[] players;
     public static bool rolling = false;
     public static bool reseted = true;
@@ -123,7 +123,7 @@ public class DiceManager : MonoBehaviour {
 
     public void NewTurn () {
         reseted = true;
-        foreach (Dice d in selected) {
+        foreach (Dice d in die) {
             d.Unlock ();
         }
     }

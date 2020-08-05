@@ -5,7 +5,8 @@ using TMPro;
 using UnityEngine;
 
 public class RollManager : MonoBehaviour {
-    public TextMeshProUGUI text;
+    public TextMeshProUGUI rollText;
+    public TextMeshProUGUI playerName;
 
     public static RollManager instance;
     public event Action<int> OnRoll;
@@ -15,11 +16,18 @@ public class RollManager : MonoBehaviour {
 
     public static int playerId;
 
+    public const int nRounds = 13;
+    public int round;
+
+    public string[] playerNames = { "player_1", "Player_2" };
+
     private void Awake () {
         instance = this;
+        LockManager.instance.OnNewTurn += NewTurn;
     }
     private void Start () {
-        LockManager.instance.OnNewTurn += NewTurn;
+        playerName.text = playerNames[0];
+        round = 1;
         playerId = 1;
         UpdateUI ();
     }
@@ -39,15 +47,24 @@ public class RollManager : MonoBehaviour {
 
     public void UpdateUI () {
         if (DiceManager.rolling) {
-            text.text = "Stop Roll";
+            rollText.text = "Stop Roll";
         } else {
-            text.text = "Roll X" + (maxRollCount - rollCount);
+            rollText.text = "Roll X" + (maxRollCount - rollCount);
         }
     }
 
     public void NewTurn () {
+        int nPlayers = DiceManager.instance.nPlayers;
         rollCount = 0;
-        playerId = (playerId == 1) ? 2 : 1;
-        UpdateUI();
+        if (playerId == nPlayers) {
+            round++;
+            //new round animation
+            if (round > nRounds) {
+                //endgame
+            }
+        }
+        playerId = 1 + (playerId % nPlayers);
+        playerName.text = playerNames[playerId - 1];
+        UpdateUI ();
     }
 }
