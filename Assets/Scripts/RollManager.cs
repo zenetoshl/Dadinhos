@@ -16,8 +16,8 @@ public class RollManager : MonoBehaviour {
 
     public static int playerId;
 
-    public const int nRounds = 13;
-    public int round;
+    public const int nRounds = 1;
+    private int round;
 
     public string[] playerNames = { "player_1", "Player_2" };
 
@@ -61,6 +61,7 @@ public class RollManager : MonoBehaviour {
             //new round animation
             if (round > nRounds) {
                 //endgame
+                TotalPointsManager.instance.EndGame();
             }
         }
         playerId = 1 + (playerId % nPlayers);

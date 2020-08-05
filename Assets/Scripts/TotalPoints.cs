@@ -9,6 +9,8 @@ public class TotalPoints : MonoBehaviour
     private int lockedPoints;
     public int selectedPoints;
 
+    public int playerId;
+
     private void Start() {
         lockedPoints = 0;
         selectedPoints = 0;
@@ -22,6 +24,10 @@ public class TotalPoints : MonoBehaviour
     public void Lock(){
         lockedPoints += selectedPoints;
         selectedPoints = 0;
+    }
+
+    public int GetPoints(){
+        return lockedPoints;
     }
 
 }
